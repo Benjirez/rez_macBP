@@ -11,18 +11,19 @@
 	<div>
 		<div id="todo-table" class="test" >
 			<form>
-				<input type="text" name="item" placeholder="Add new item... " required /> 
+				<input type="text" name="item" placeholder="Add new item... " required />
 				<button type="submit">Add Item</button>
 			</form>
 			<ol>
 				<% for(var i=0; i < todos.length; i++){ %>
-				<li><%= todos[i].item %></li>
+				<li id='<%= todos[i]._id %>'><%= todos[i].item %></li>
 				<% } %>
 			</ol>
 		</div>
+		<!--
 		<div id="todo-table-2" class="test" >
 		<form>
-			<input type="text" name="item" placeholder="Add new item... " required /> 
+			<input type="text" name="item" placeholder="Add new item... " required />
 			<button type="submit">Add Item</button>
 		</form>
 		<ol>
@@ -31,6 +32,7 @@
 			<% } %>
 		</ol>
 	</div>
+	-->
 	</div>
 </body>
 </html>

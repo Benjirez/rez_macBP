@@ -14,50 +14,29 @@ var model3 = mongoose.model('quicktext3', mongoose.Schema({title:[], texts: [tex
 
 var model0 = mongoose.model('schematest', mongoose.Schema( {a1: []} ) );
 
-
-var textOut2 = "";
-
+var textOut = "";
+var nestLevel ="";
 
 function dig(o0){
 
 	o0 = JSON.parse ( JSON.stringify( o0 ) );
 
 	if (Object.prototype.toString.call( o0 ) === "[object Object]"){
-		if (o0.title){
-			textOut2 += "<H1 style='color: salmon' class='toggler'>" + o0.title.__cdata  + "</h1><br>";
-		}
+		nestLevel += "-- ";
 		for (o1 in o0){
-			//textOut += nestLevel + "Object key: " + o1 + ", val: " + o0[o1] + "<br>";
+			textOut += nestLevel + "Object key: " + o1 + ", val: " + o0[o1] + "<br>";
 			dig( o0[o1] );
 		}
-
 		//textOut += "<br>";
-		//nestLevel = nestLevel.slice(0,-3);
+		nestLevel = nestLevel.slice(0,-3);
 	}else if (Object.prototype.toString.call( o0 ) === "[object Array]"){
 		for (var o1 = 0; o1 < o0.length; o1++){
-			if (o0[o1].name){
-				textOut2 += "<div class='toggler'><b style='color: khaki' style='display:none;'>" + o0[o1].name.__cdata +" </b>";
-				//textOut2 += o0[o1].body  + "<br><br>";
-				
-				if (o0[o1].keyword){
-					textOut2 += "<b style='color: lightgreen'> " + o0[o1].keyword.__cdata + " </b><br>";
-					//textOut2 += o0[o1].body  + "<br>";
-				}else{textOut2 += "<br>"}
-				if (o0[o1].body){
-					textOut2 += "<div class='toggles' style='display:none;'>" + o0[o1].body.__cdata + "</div><br>";
-					//textOut2 += o0[o1].body  + "<br><br>";
-				}
-				
-				textOut2 +=   "</div>";
-					
-			}
-			
-			//textOut += nestLevel + "Array key: " + o1 + ", val: " + o0[o1] + "<br>";
+			textOut += nestLevel + "Array key: " + o1 + ", val: " + o0[o1] + "<br>";
 			dig( o0[o1] );
 		}
 
 	}
-
+	if (nestLevel ===""){ textOut += "<br>"; }
 }
 
 module.exports = function(xsvr){
@@ -67,7 +46,8 @@ module.exports = function(xsvr){
 //route get /sch - sends text
 		xsvr.get('/sch', function(req, res){
 
-		textOut2 = "";
+		textOut = "";
+		nestLevel = "";
 
 		var myItems = model3.find().lean().exec({}, function(err, data){
 			if (err) throw err;
@@ -76,13 +56,12 @@ module.exports = function(xsvr){
 			dataJson = JSON.parse( dataStr );
 
 			//console.log( dataJson  );
-			//textOut += "data: " + dataStr + "<br><br>";
-
+			textOut += "data: " + dataStr + "<br><br>";
 
 			dig( dataJson );
 
 
-			res.render('view0', {myData: textOut2});
+			res.render('view0', {myData: textOut});
 			//res.send(data);
 
 		});

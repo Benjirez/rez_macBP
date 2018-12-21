@@ -24,7 +24,7 @@ function dig(o0){
 
 	if (Object.prototype.toString.call( o0 ) === "[object Object]"){
 		if (o0.title){
-			textOut2 += "<H1 style='color: salmon' class='toggler'>" + o0.title.__cdata  + "</h1><br>";
+			textOut2 += "<h2 style='color: salmon' class='toggler'; >" + o0.title.__cdata  + "</h2><br>";
 		}
 		for (o1 in o0){
 			//textOut += nestLevel + "Object key: " + o1 + ", val: " + o0[o1] + "<br>";
@@ -61,6 +61,32 @@ function dig(o0){
 }
 
 module.exports = function(xsvr){
+	
+//route get /ext - sends text
+		xsvr.get('/ext', function(req, res){
+
+		textOut2 = "";
+
+		var myItems = model3.find().lean().exec({}, function(err, data){
+			if (err) throw err;
+
+			dataStr = JSON.stringify(data, null, '\t');
+			dataJson = JSON.parse( dataStr );
+
+			//console.log( dataJson  );
+			//textOut += "data: " + dataStr + "<br><br>";
+
+
+			dig( dataJson );
+
+
+			res.render('viewExt', {myData: textOut2});
+			//res.send(data);
+
+		});
+		console.log('ext called');
+	});
+
 
 
 

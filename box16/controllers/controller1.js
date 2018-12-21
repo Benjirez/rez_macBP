@@ -3,6 +3,9 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({extend: false});
 
+//var Mousetrap = require('mousetrap');
+//var copy = require('clipboard-copy');
+
 mongoose.connect('mongodb://'+ dbcreds.user +':' + dbcreds.pw + '@ds051913.mlab.com:51913/rezdb');
 var model1 = mongoose.model('rez2_collection1', mongoose.Schema({item: String}) ); //todoModel
 var model2 = mongoose.model('rez2_collection2', mongoose.Schema({item: String}) ); //todoModel
@@ -14,6 +17,10 @@ var model3 = mongoose.model('quicktext3', mongoose.Schema({title:[], texts: [tex
 
 var model0 = mongoose.model('schematest', mongoose.Schema( {a1: []} ) );
 
+var model_x1 = mongoose.model('model_x1s', mongoose.Schema({
+		col_a: String, col_b: String, col_c: String, col_d: String, col_e: String,
+		col_f: String, col_g: String, col_h: String, col_i: String, col_j: String
+	}) );
 
 var textOut2 = "";
 
@@ -24,7 +31,7 @@ function dig(o0){
 
 	if (Object.prototype.toString.call( o0 ) === "[object Object]"){
 		if (o0.title){
-			textOut2 += "<H1 style='color: salmon' class='toggler'>" + o0.title.__cdata  + "</h1><br>";
+			textOut2 += "<h2 style='color: salmon' class='toggler'; >" + o0.title.__cdata  + "</h2><br>";
 		}
 		for (o1 in o0){
 			//textOut += nestLevel + "Object key: " + o1 + ", val: " + o0[o1] + "<br>";
@@ -38,7 +45,7 @@ function dig(o0){
 			if (o0[o1].name){
 				textOut2 += "<div class='toggler'><b style='color: khaki' style='display:none;'>" + o0[o1].name.__cdata +" </b>";
 				//textOut2 += o0[o1].body  + "<br><br>";
-				
+
 				if (o0[o1].keyword){
 					textOut2 += "<b style='color: lightgreen'> " + o0[o1].keyword.__cdata + " </b><br>";
 					//textOut2 += o0[o1].body  + "<br>";
@@ -47,11 +54,11 @@ function dig(o0){
 					textOut2 += "<div class='toggles' style='display:none;'>" + o0[o1].body.__cdata + "</div><br>";
 					//textOut2 += o0[o1].body  + "<br><br>";
 				}
-				
+
 				textOut2 +=   "</div>";
-					
+
 			}
-			
+
 			//textOut += nestLevel + "Array key: " + o1 + ", val: " + o0[o1] + "<br>";
 			dig( o0[o1] );
 		}
@@ -61,6 +68,32 @@ function dig(o0){
 }
 
 module.exports = function(xsvr){
+
+//route get /ext - sends text
+		xsvr.get('/ext', function(req, res){
+
+		textOut2 = "";
+
+		var myItems = model3.find().lean().exec({}, function(err, data){
+			if (err) throw err;
+
+			dataStr = JSON.stringify(data, null, '\t');
+			dataJson = JSON.parse( dataStr );
+
+			//console.log( dataJson  );
+			//textOut += "data: " + dataStr + "<br><br>";
+
+
+			dig( dataJson );
+
+
+			res.render('viewExt', {myData: textOut2});
+			//res.send(data);
+
+		});
+		console.log('ext called');
+	});
+
 
 
 
@@ -153,6 +186,104 @@ module.exports = function(xsvr){
 		console.log('qt called');
 	});
 
+
+	// WIG1
+	xsvr.get('/wig1', function (req, res) {
+		var data = model1.find({}, function (err, data) {
+			if (err) throw err;
+			//console.log('into the shoot flyboy');
+			//res.render('view1', {todos: data, todos2: data2});
+
+			var data2 = model2.find({}, function (err, data2) {
+				if (err) throw err;
+				//console.log('into the shoot flyboy');
+
+				xsvr.locals.myData = data;
+				res.render('view_Wig1', { todos: data, todos2: data2 });
+
+			});
+
+		});
+
+
+
+		console.log('controller1 called route wig1');
+	});
+
+	// drag1
+	xsvr.get('/drag1', function (req, res) {
+		var data = model1.find({}, function (err, data) {
+			if (err) throw err;
+			//console.log('into the shoot flyboy');
+			//res.render('view1', {todos: data, todos2: data2});
+
+			var data2 = model2.find({}, function (err, data2) {
+				if (err) throw err;
+				//console.log('into the shoot flyboy');
+				res.render('view_drag1', { data: data, data2: data2 });
+
+			});
+
+		});
+
+		console.log('controller1 called route drag1');
+	});
+
+	// x1
+	xsvr.get('/x1', function (req, res) {
+		var data = model_x1.find({}, function (err, data) {
+			if (err) throw err;
+			//console.log('into the shoot flyboy');
+			//xsvr.locals.myData = data;
+			res.render('view_x1', {data: data});
+			});
+
+			/*
+			var data2 = model2.find({}, function (err, data2) {
+				if (err) throw err;
+				//console.log('into the shoot flyboy');
+				//data = data.replace(/\s/g, '&nbsp;');
+				res.render('view_x1', { data: data, data2: data2 });
+
+			});
+			*/
+
+
+		//});
+
+		console.log('controller1 called route drag1');
+	});
+
+
+	//create new todoModel with data from req.body, push to db, reload view
+	xsvr.post('/x1', urlencodedParser, function (req, res) {
+		var new_x1 = model_x1(req.body).save(function (err, data) {
+			if (err) throw err;
+			res.json(data);
+			console.log(data);
+		});
+	});
+
+
+	xsvr.delete('/x1:item', function(req, res){
+		//delete requested item from db
+		var myItem = {item: req.params.item};
+		console.log( myItem );
+		model_x1.find( {_id: myItem.item} ).remove(function(err, data){
+			if (err) throw err;
+				//console.log(myItem.item +' '+ data);
+				//model2.find( {_id: myItem.item} ).remove(function(err, data){
+				//if (err) throw err;
+				res.json(data);
+				console.log(myItem.item +' '+ data);
+				//});
+
+		});
+	});
+
+
+
+
 	// get todo data and render view
 	xsvr.get('/', function(req, res){
 		var data = model1.find({}, function(err, data){
@@ -170,7 +301,7 @@ module.exports = function(xsvr){
 	});
 
 
-		console.log('controller1 called');
+		console.log('controller1 default / route called');
 	});
 
 	//create new todoModel with data from req.body, push to db, reload view

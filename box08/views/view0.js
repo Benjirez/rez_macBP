@@ -1,8 +1,5 @@
 $(document).ready(function(){
-	
-	$(".toggler").click(function(){
-        $(this).children(".toggles").toggle();
-    });
+
 
 	$('#form1').on('submit', function(){
 		console.log('submitting yo');

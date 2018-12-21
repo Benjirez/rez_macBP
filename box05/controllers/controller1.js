@@ -10,111 +10,48 @@ var model2 = mongoose.model('rez2_collection2', mongoose.Schema({item: String}) 
 
 var textsSch = mongoose.Schema({text:[ {name: String, keyword: String, body: String} ]});
 
-var model3 = mongoose.model('quicktext3', mongoose.Schema({title:[], texts: [textsSch] }) );
-
-var model0 = mongoose.model('schematest', mongoose.Schema( {a1: []} ) );
 
 
-var textOut2 = "";
-
-
-function dig(o0){
-
-	o0 = JSON.parse ( JSON.stringify( o0 ) );
-
-	if (Object.prototype.toString.call( o0 ) === "[object Object]"){
-		if (o0.title){
-			textOut2 += "<H1 style='color: salmon' class='toggler'>" + o0.title.__cdata  + "</h1><br>";
-		}
-		for (o1 in o0){
-			//textOut += nestLevel + "Object key: " + o1 + ", val: " + o0[o1] + "<br>";
-			dig( o0[o1] );
-		}
-
-		//textOut += "<br>";
-		//nestLevel = nestLevel.slice(0,-3);
-	}else if (Object.prototype.toString.call( o0 ) === "[object Array]"){
-		for (var o1 = 0; o1 < o0.length; o1++){
-			if (o0[o1].name){
-				textOut2 += "<div class='toggler'><b style='color: khaki' style='display:none;'>" + o0[o1].name.__cdata +" </b>";
-				//textOut2 += o0[o1].body  + "<br><br>";
-				
-				if (o0[o1].keyword){
-					textOut2 += "<b style='color: lightgreen'> " + o0[o1].keyword.__cdata + " </b><br>";
-					//textOut2 += o0[o1].body  + "<br>";
-				}else{textOut2 += "<br>"}
-				if (o0[o1].body){
-					textOut2 += "<div class='toggles' style='display:none;'>" + o0[o1].body.__cdata + "</div><br>";
-					//textOut2 += o0[o1].body  + "<br><br>";
-				}
-				
-				textOut2 +=   "</div>";
-					
-			}
-			
-			//textOut += nestLevel + "Array key: " + o1 + ", val: " + o0[o1] + "<br>";
-			dig( o0[o1] );
-		}
-
-	}
-
-}
+var model3 = mongoose.model('quicktext2', mongoose.Schema({title:[], texts: [textsSch] }) ); //todoModel
 
 module.exports = function(xsvr){
 
-
-
-//route get /sch - sends text
-		xsvr.get('/sch', function(req, res){
-
-		textOut2 = "";
-
-		var myItems = model3.find().lean().exec({}, function(err, data){
+	// get todo data and render view
+	xsvr.get('/', function(req, res){
+		var data = model1.find({}, function(err, data){
 			if (err) throw err;
-
-			dataStr = JSON.stringify(data, null, '\t');
-			dataJson = JSON.parse( dataStr );
-
-			//console.log( dataJson  );
-			//textOut += "data: " + dataStr + "<br><br>";
-
-
-			dig( dataJson );
-
-
-			res.render('view0', {myData: textOut2});
-			//res.send(data);
-
-		});
-		console.log('sch called');
-	});
-
-	//create new todoModel with data from req.body, push to db, reload view
-	xsvr.post('/sch', urlencodedParser, function(req, res){
-		var newItem = model0(req.body).save(function(err, data){
+			//console.log('into the shoot flyboy');
+			//res.render('view1', {todos: data, todos2: data2});
+			
+			var data2 = model2.find({}, function(err, data2){
 			if (err) throw err;
-			res.json(data);
-			console.log(data);
+			//console.log('into the shoot flyboy');
+			res.render('view1', {todos: data, todos2: data2});
+			
 		});
+		
+		
+		});
+		
+
+		console.log('controller1 called');
 	});
-
-
-
+	
 	// get /qt2 query for data and render view2
 	xsvr.get('/qt2', function(req, res){
 		var data = model3.find({}, function(err, data){
 			if (err) throw err;
 			//console.log('into the shoot flyboy');
 			//res.render('view1', {todos: data, todos2: data2});
-
+			
 			res.render('view2', {myData: data});
-
+		
 		});
-
+		
 
 		console.log('controller1 called');
 	});
-
+	
 	//route get /qt - sends text
 		xsvr.get('/qt', function(req, res){
 		var data = model3.find({}, function(err, data){
@@ -123,12 +60,12 @@ module.exports = function(xsvr){
 			//res.render('view1', {todos: data, todos2: data2});
 
 			var text = "";
-
+			
 	// model3 data structure
 	// myData[ group index ].texts[0].text[template index].name,keyword,body,_shortcut,_type
-
+			
 			function treeMe(myData){
-
+				
 				var myGroup;
 				for (myGroup = 0; myGroup < myData.length; myGroup++){
 					text += "<h1>"+ (myGroup +1)+". " + myData[myGroup].title +"</h1>";
@@ -140,8 +77,8 @@ module.exports = function(xsvr){
 					}
 				}
 			}
-
-
+				
+			
 			treeMe(data);
 			//regex to clean up data... no longer necessary.
 			//text = text.replace(/\n\r/g, '<br>');
@@ -153,26 +90,6 @@ module.exports = function(xsvr){
 		console.log('qt called');
 	});
 
-	// get todo data and render view
-	xsvr.get('/', function(req, res){
-		var data = model1.find({}, function(err, data){
-			if (err) throw err;
-			//console.log('into the shoot flyboy');
-			//res.render('view1', {todos: data, todos2: data2});
-
-			var data2 = model2.find({}, function(err, data2){
-			if (err) throw err;
-			//console.log('into the shoot flyboy');
-			res.render('view1', {todos: data, todos2: data2});
-
-		});
-
-	});
-
-
-		console.log('controller1 called');
-	});
-
 	//create new todoModel with data from req.body, push to db, reload view
 	xsvr.post('/', urlencodedParser, function(req, res){
 		var newTodo = model1(req.body).save(function(err, data){
@@ -181,7 +98,7 @@ module.exports = function(xsvr){
 			console.log(data);
 		});
 	});
-
+	
 	xsvr.post('/form2', urlencodedParser, function(req, res){
 		var newTodo = model2(req.body).save(function(err, data){
 			if (err) throw err;
@@ -202,9 +119,9 @@ module.exports = function(xsvr){
 				res.json(data);
 				console.log(myItem.item +' '+ data);
 				});
-
+		
 		});
 	});
-
-
+	
+	
 };

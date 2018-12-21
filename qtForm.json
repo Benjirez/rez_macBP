@@ -1,0 +1,25 @@
+{
+    "_id": {
+        "$oid": "5abeb6cfddf0420aaf49b439"
+    },
+    "title": {
+        "__cdata": "cbl "
+    },
+    "texts": {
+        "text": [
+            {
+                "name": {
+                    "__cdata": "Hosa IEC Cables - hiecc"
+                },
+                "keyword": {
+                    "__cdata": "hiecc"
+                },
+                "body": {
+                    "__cdata": "<a href=\"http://hosatech.com/product-category/power/power-cords/\">Hosa IECCables (see specifically the C13 types) <\/a>"
+                },
+                "_shortcut": "",
+                "_type": "1"
+            }
+        ]
+    }
+}
